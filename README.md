@@ -2,7 +2,7 @@
 
 Proyecto Full Stack con React (Frontend) y FastAPI (Backend)
 
-## 🚀 Inicio Rápido con Docker
+## Inicio Rápido con Docker
 
 Para levantar todo el proyecto completo:
 
@@ -10,7 +10,6 @@ Para levantar todo el proyecto completo:
 docker compose up --build -d
 ```
 
-Esto iniciará:
 - **Backend (FastAPI):** http://localhost:8000
 - **Frontend (React):** http://localhost:5173
 
