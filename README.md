@@ -1,10 +1,6 @@
 # Comp-Ex2-Extra
 
-Proyecto Full Stack con React (Frontend) y FastAPI (Backend)
-
-## Inicio Rápido con Docker
-
-Para levantar todo el proyecto completo:
+## Iniciar el proyecto
 
 ```bash
 docker compose up --build -d
