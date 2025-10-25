@@ -15,7 +15,7 @@ def health():
 @router.post("/api/lr1/parse-string")
 async def parse_string_lr1(request: GrammarRequest):
     try:
-        parser = LR1Parser(request.grammar_text)
+        parser = LR1Parser(request.grammar_text, request.input_string)
         
         if not parser.build():
             raise HTTPException(
@@ -25,8 +25,9 @@ async def parse_string_lr1(request: GrammarRequest):
         
         visualizations = parser.generate_visualizations()
         summary = parser.get_summary()
+        parse_result = parser.parse()
         
-        return {
+        result = {
             "success": True,
             "parsing_result": {
                 "message": f"Parser construido {'exitosamente' if summary['table']['is_lr1'] else 'con conflictos'}",
@@ -44,9 +45,22 @@ async def parse_string_lr1(request: GrammarRequest):
                 "images_available": len(visualizations) > 0,
                 "afn_image": visualizations.get('afn'),
                 "afd_image": visualizations.get('afd'),
-                "table_html": None
+                "table_data": parse_result['table'] if parse_result else None
             }
         }
+        
+        if parse_result and 'transition_table' in parse_result:
+            result["string_parsing"] = {
+                "input_string": parse_result['transition_table']['input_string'],
+                "accepted": parse_result['transition_table']['accepted'],
+                "transitions": parse_result['transition_table']['transitions'],
+                "final_state": {
+                    "stack": parse_result['transition_table']['final_stack'],
+                    "position": parse_result['transition_table']['current_position']
+                }
+            }
+        
+        return result
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")

@@ -39,6 +39,3 @@ class AFN:
     
     def __len__(self):
         return len(self.estados)
-    
-    def __str__(self):
-        return f"AFN(estados={len(self.estados)}, inicial={self.nodo_inicial})"

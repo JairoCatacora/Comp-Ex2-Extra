@@ -7,12 +7,6 @@ class AFDState:
         self.transitions = {}
         self.id = frozenset(item.id for item in items)
     
-    def __str__(self):
-        return "\n".join(str(item) for item in self.items)
-    
-    def __repr__(self):
-        return f"AFDState(items={len(self.items)})"
-    
     def __eq__(self, other):
         if not isinstance(other, AFDState):
             return False
@@ -26,29 +20,6 @@ class AFDState:
     
     def get_transition(self, symbol):
         return self.transitions.get(symbol)
-    
-    def get_actions(self):
-        actions = {}
-        
-        for item in self.items:
-            if item.is_reducible():
-                if item.regla.startswith("S' ->") and item.is_reducible():
-                    if item.lookahead == '$':
-                        actions['$'] = ('accept', None)
-                else:
-                    lookahead = item.lookahead
-                    if lookahead not in actions:
-                        actions[lookahead] = []
-                    if isinstance(actions[lookahead], list):
-                        actions[lookahead].append(('reduce', item))
-                    else:
-                        actions[lookahead] = [actions[lookahead], ('reduce', item)]
-            else:
-                next_symbol = item.get_next_symbol()
-                if next_symbol:
-                    actions.setdefault('shift', set()).add(next_symbol)
-        
-        return actions
 
 
 class AFD:
@@ -158,6 +129,3 @@ class AFD:
     
     def __len__(self):
         return len(self.estados)
-    
-    def __str__(self):
-        return f"AFD(estados={len(self.estados)})"

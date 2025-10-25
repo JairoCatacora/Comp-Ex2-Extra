@@ -48,6 +48,8 @@ class LRTable:
             return
         
         target_num = self.afd.get_state_number(target_state)
+        if target_num == -1:
+            return
         
         if self.grammar.is_terminal(next_symbol):
             self._add_action(estado_num, next_symbol, 'shift', target_num)
@@ -57,9 +59,26 @@ class LRTable:
     def _add_action(self, estado, terminal, accion, valor):
         if terminal in self.action_table[estado]:
             existing_action = self.action_table[estado][terminal]
-            self._record_conflict(estado, terminal, existing_action, (accion, valor))
+            if existing_action != (accion, valor):
+                self._record_conflict(estado, terminal, existing_action, (accion, valor))
+                if self._should_prefer_new_action(existing_action, (accion, valor)):
+                    self.action_table[estado][terminal] = (accion, valor)
         else:
             self.action_table[estado][terminal] = (accion, valor)
+    
+    def _should_prefer_new_action(self, existing_action, new_action):
+        existing_type, existing_val = existing_action
+        new_type, new_val = new_action
+        
+        if existing_type == 'reduce' and new_type == 'shift':
+            return True
+        elif existing_type == 'shift' and new_type == 'reduce':
+            return False
+            
+        elif existing_type == 'reduce' and new_type == 'reduce':
+            return new_val < existing_val
+            
+        return False
     
     def _record_conflict(self, estado, terminal, action1, action2):
         if estado not in self.conflicts:
@@ -97,6 +116,67 @@ class LRTable:
     def has_conflicts(self):
         return len(self.conflicts) > 0
     
-    def __str__(self):
-        conflicts_str = f", conflictos={len(self.conflicts)}" if self.conflicts else ""
-        return f"LRTable(estados={len(self.action_table)}{conflicts_str})"
+    def to_dict(self):
+        terminales_list = sorted(list(self.terminales))
+        no_terminales_list = sorted(list(self.no_terminales))
+        
+        table_data = {
+            "headers": {
+                "action": terminales_list,
+                "goto": no_terminales_list
+            },
+            "rows": []
+        }
+        
+        for estado_num in sorted(self.action_table.keys()):
+            row = {
+                "state": estado_num,
+                "action": {},
+                "goto": {}
+            }
+            
+            for terminal in terminales_list:
+                action = self.get_action(estado_num, terminal)
+                if action:
+                    action_type, value = action
+                    if action_type == 'shift':
+                        row["action"][terminal] = f"s{value}"
+                    elif action_type == 'reduce':
+                        row["action"][terminal] = f"r{value}"
+                    elif action_type == 'accept':
+                        row["action"][terminal] = "acc"
+                else:
+                    row["action"][terminal] = ""
+            
+            for no_terminal in no_terminales_list:
+                goto = self.get_goto(estado_num, no_terminal)
+                row["goto"][no_terminal] = str(goto) if goto is not None else ""
+            
+            table_data["rows"].append(row)
+        
+        conflicts_data = []
+        for estado, estado_conflicts in self.conflicts.items():
+            for terminal, conflict_info in estado_conflicts.items():
+                conflicts_data.append({
+                    "state": estado,
+                    "terminal": terminal,
+                    "type": conflict_info["type"],
+                    "action1": self._format_action(conflict_info["action1"]),
+                    "action2": self._format_action(conflict_info["action2"])
+                })
+        
+        return {
+            "table": table_data,
+            "conflicts": conflicts_data,
+            "grammar_rules": self.grammar.reglas
+        }
+    
+    def _format_action(self, action):
+        action_type, value = action
+        if action_type == 'shift':
+            return f"shift {value}"
+        elif action_type == 'reduce':
+            return f"reduce {value}"
+        elif action_type == 'accept':
+            return "accept"
+        return str(action)

@@ -64,15 +64,65 @@
   box-shadow: inset 0 0 20px rgba(33, 150, 243, 0.1) !important;
 }
 
+.image-wrapper {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.image-wrapper:hover {
+  transform: scale(1.02);
+}
+
+.image-wrapper:hover .image-overlay {
+  opacity: 1;
+}
+
+.clickable-image {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 8px !important;
+  transition: transform 0.3s ease !important;
+  display: block;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 8px;
+}
+
+.zoom-button {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1976d2 !important;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.zoom-button:hover {
+  background: #ffffff !important;
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
 .automaton-image {
   max-width: 100% !important;
   height: auto !important;
   border-radius: 8px !important;
   transition: transform 0.3s ease !important;
-}
-
-.automaton-image:hover {
-  transform: scale(1.02);
 }
 
 .no-image-placeholder {

@@ -9,6 +9,7 @@ import ParsingResults from "../components/ParsingResults";
 import AFNVisualization from "../components/AFNVisualization";
 import AFDVisualization from "../components/AFDVisualization";
 import LRTable from "../components/LRTable";
+import TransitionTable from "../components/TransitionTable";
 
 function Parser() {
   const [result, setResult] = useState(null);
@@ -61,6 +62,9 @@ function Parser() {
             <Box className="results-container">
               <ParsingResults result={result} statistics={result.statistics} />
               <LRTable result={result} statistics={result.statistics} />
+              {result.string_parsing && (
+                <TransitionTable transitionData={result.string_parsing} />
+              )}
               {result.visualizations?.images_available && (
                 <Box>
                   <AFNVisualization 

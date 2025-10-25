@@ -3,16 +3,19 @@ from .item import LR1Item
 from .afn import AFN
 from .afd import AFD
 from .table import LRTable
+from .transition_table import TransitionTable
 from .visualizer import Visualizer
 
 class LR1Parser:
     
-    def __init__(self, grammar_content):
+    def __init__(self, grammar_content, input_string=""):
         self.grammar_content = grammar_content
+        self.input_string = input_string
         self.grammar = None
         self.afn = None
         self.afd = None
         self.table = None
+        self.transition_table = None
         self.visualizer = Visualizer()
         self.is_built = False
         self.build_errors = []
@@ -24,13 +27,10 @@ class LR1Parser:
             self.afd = AFD(self.afn)
             self.table = LRTable(self.afd)
             
-            if self.table.has_conflicts():
-                print(f"   Tabla con {len(self.table.conflicts)} conflictos")
-            else:
-                print("   Tabla sin conflictos (Gramática LR(1))")
+            if self.input_string:
+                self.transition_table = TransitionTable(self.input_string, self.table)
             
             self.is_built = True
-            print("Parser construido exitosamente\n")
             return True
             
         except Exception as e:
@@ -85,6 +85,28 @@ class LR1Parser:
             }
         }
     
-    def __str__(self):
-        status = "construido" if self.is_built else "no construido"
-        return f"LR1Parser({status})"
+    def parse(self):
+        if not self.is_built:
+            if not self.build():
+                return None
+        
+        result = {
+            'table': self.table.to_dict(),
+            'conflicts': self.table.conflicts if hasattr(self.table, 'conflicts') else [],
+            'grammar': {
+                'terminals': list(self.grammar.get_simbolos_terminales()),
+                'non_terminals': list(self.grammar.get_simbolos_no_terminales()),
+                'productions': self.grammar.reglas
+            }
+        }
+        
+        if hasattr(self, 'transition_table') and self.transition_table:
+            result['transition_table'] = {
+                'input_string': self.transition_table.input_string,
+                'transitions': self.transition_table.transitions,
+                'accepted': self.transition_table.is_accepted(),
+                'final_stack': self.transition_table.stack,
+                'current_position': self.transition_table.current_position
+            }
+        
+        return result

@@ -55,7 +55,7 @@ class Grammar:
             if len(partes) == 2:
                 lado_derecho = partes[1].split()
                 for simbolo in lado_derecho:
-                    if self.is_terminal(simbolo):
+                    if self.is_terminal(simbolo) and simbolo not in ['ε', 'epsilon']:
                         terminales.add(simbolo)
         return terminales
     
@@ -103,7 +103,7 @@ class Grammar:
             if len(partes) == 2:
                 lado_derecho = partes[1].split()
                 
-                if not lado_derecho or lado_derecho == ['']:
+                if not lado_derecho or lado_derecho == [''] or lado_derecho == ['ε'] or lado_derecho == ['epsilon']:
                     first_set.add('ε')
                 else:
                     for simbolo in lado_derecho:
@@ -156,9 +156,3 @@ class Grammar:
         
         self._follow_cache[nonterminal] = follow_set
         return follow_set
-    
-    def __str__(self):
-        return "\n".join(self.reglas)
-    
-    def __repr__(self):
-        return f"Grammar(reglas={len(self.reglas)}, start={self.start_symbol})"
