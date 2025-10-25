@@ -1,13 +1,10 @@
-import { useState } from "react";
-import GetHealth from "../components/GetHealth"; 
+import LR1Parser from "../components/LR1Parser";
 
 function Home() {
-  const [data, setData] = useState(null);
-
   return (
     <div>
-      <h1>Home</h1>
-      <GetHealth />
+      <h1>Analizador Sintáctico LR(1)</h1>
+      <LR1Parser />
     </div>
   );
 }

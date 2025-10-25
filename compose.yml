@@ -7,12 +7,9 @@ services:
     working_dir: /app
     ports:
       - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=development
-    command: ["npm", "run", "dev", "--", "--host"]
+    restart: unless-stopped
 
   backend:
     build:
